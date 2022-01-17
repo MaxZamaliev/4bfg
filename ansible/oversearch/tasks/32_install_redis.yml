@@ -1,0 +1,13 @@
+---
+
+- name: Устанавливаем redis
+  apt:
+    pkg:
+      - redis
+    state: latest
+    update_cache: true
+
+- name: Копируем конфигурационый файл redis
+  copy:
+    src: "{{ role_path }}/files/etc/redis/redis.conf"
+    dest: "/etc/redis/redis.conf"

@@ -1,0 +1,11 @@
+---
+
+- name: Добавляем группу
+  group:
+    name: "{{ default_user }}"
+
+- name: Добавляем пользователя
+  user:
+    name: "{{ default_user }}"
+    group: "{{ default_user }}"
+    shell: /bin/bash

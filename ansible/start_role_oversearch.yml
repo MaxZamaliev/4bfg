@@ -1,0 +1,5 @@
+---
+- hosts: oversearch_container
+  gather_facts: no
+  roles:
+    - oversearch

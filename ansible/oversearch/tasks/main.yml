@@ -1,0 +1,28 @@
+---
+# tasks file for oversearch
+
+- name: Добавление непривилегированного пользователя
+  include_tasks: tasks/10_add_user.yml
+
+- name: Установка python {{python_version}}
+  include_tasks: tasks/20_install_python.yml
+
+- name: Установка mysqld
+  include_tasks: tasks/31_install_mysqld.yml
+
+- name: Установка redis
+  include_tasks: tasks/32_install_redis.yml
+
+- name: Установка приложения stack_oversearch
+  include_tasks: tasks/40_install_oversearch.yml
+
+- name: Установка gunicorn
+  include_tasks: tasks/50_install_gunicorn.yml
+
+- name: Установка nginx
+  include_tasks: tasks/65_install_nginx.yml
+
+- name: Установка supervisord
+  include_tasks: tasks/70_install_supervisor.yml
+
+

@@ -1,0 +1,7 @@
+---
+- name: Устанавливаем mysql
+  apt:
+    pkg:
+      - mysql-server
+    state: latest
+    update_cache: true

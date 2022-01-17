@@ -1,0 +1,6 @@
+---
+# vars file for oversearch
+
+python_version: "3.6.13"
+default_user: "user"
+venv_path: "/home/{{default_user}}/stack_over_search/venv"

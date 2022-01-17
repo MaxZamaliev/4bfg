@@ -1,0 +1,7 @@
+all:
+  hosts:
+    oversearch_container:
+      ansible_host: %IPADDR%
+      ansible_user: root
+      ansible_ssh_private_key_file: configs/private_ssh.key
+      ansible_python_interpreter: /usr/bin/python3

@@ -1,0 +1,12 @@
+---
+- name: Устанавливаем nginx
+  apt:
+    pkg:
+      - nginx
+    state: latest
+    update_cache: true
+
+- name: Копируем конфигурационый файл nginx
+  copy:
+    src: "{{ role_path }}/files/etc/nginx/sites-available/default"
+    dest: "/etc/nginx/sites-available/default"

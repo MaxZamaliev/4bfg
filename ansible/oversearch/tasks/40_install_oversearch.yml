@@ -1,0 +1,102 @@
+---
+- name: Устанавливаем необходимые пакеты
+  apt:
+    pkg:
+      - git
+      - python3-pymysql
+      - python3-pip
+    state: latest
+    update_cache: true
+
+- name: Устанавливаем pymysql
+  pip:
+    name: pymysql
+    state: present
+
+- name: Клонируем приложение
+  become: yes
+  become_user: "{{ default_user }}"
+  become_method: su
+  git:
+    repo: "https://github.com/bfg-group/stack_over_search.git"
+    dest: "/home/user/stack_over_search"
+    clone: yes
+
+- name: Устанавливаем склонированное приложение
+  become: yes
+  become_user: "{{ default_user }}"
+  become_method: su
+  pip:
+    chdir: "/home/user/stack_over_search"
+    virtualenv: "{{ venv_path }}"
+    virtualenv_command: "/usr/local/bin/python3 -m venv"
+    editable: yes
+    state: present
+    name: .
+
+- name: Обновляем aiohttp
+  become: yes
+  become_user: "{{ default_user }}"
+  become_method: su
+  pip:
+    name: aiohttp
+    virtualenv: "{{ venv_path }}"
+    state: latest
+
+- name: Создаём директорию /etc/stackoversearch
+  file:
+    path: "/etc/stackoversearch"
+    state: directory
+    mode: '0755'
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+
+- name: Создаём директорию /etc/stackoversearch/logs
+  file:
+    path: "/etc/stackoversearch/logs"
+    state: directory
+    mode: '0755'
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+
+- name: Копируем файл stack_settings.ini
+  copy:
+    remote_src: yes
+    src: "/home/{{ default_user }}/stack_over_search/stackoversearch/stack_settings.ini"
+    dest: "/etc/stackoversearch/stack_settings.ini"
+
+- name: Изменяем в файле stack_settings.ini имя пользователя для подключения к mysql
+  lineinfile:
+    dest: "/etc/stackoversearch/stack_settings.ini"
+    regexp: '^user ='
+    line: 'user = user'
+
+- name: Запускаем mysqld
+  command: "service mysql start"
+  args:
+    warn: false
+
+- name: Создаём пользователя для подключения к mysql
+  command: "mysql -u root -e \"CREATE USER 'user'@'localhost' IDENTIFIED BY 'BlackCat00' ; GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost'; FLUSH PRIVILEGES;\""
+  args:
+    warn: false
+
+- name: Создаём базу данных
+  mysql_db:
+    login_user: "user"
+    login_password: "BlackCat00"
+    name: stack_exchange
+    state: present
+
+- name: Создаём таблицы в mysql
+  mysql_db:
+    login_user: "user"
+    login_password: "BlackCat00"
+    name: stack_exchange
+    state: import
+    target: "/home/{{ default_user }}/stack_over_search/tables.sql"
+
+- name: Останавливаем mysqld
+  command: "service mysql stop"
+  args:
+    warn: false

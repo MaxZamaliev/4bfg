@@ -1,0 +1,24 @@
+---
+- name: Устанавливаем supervisor
+  apt:
+    pkg:
+      - supervisor
+    state: latest
+    update_cache: true
+
+- name: Копируем конфигурационые файлы для supervisord
+  copy:
+    src: "{{ role_path }}/files/etc/supervisor/conf.d/"
+    dest: "/etc/supervisor/conf.d/"
+
+- name: Включаем автозапуск supervisor
+  lineinfile:
+    dest: "/entrypoint.sh"
+    regexp: '^#/etc/init.d/supervisor start'
+    line: '/etc/init.d/supervisor start'
+
+- name: Запускаем supervisord
+  service:
+    name: supervisor
+    state: started
+    enabled: yes
